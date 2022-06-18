@@ -51,28 +51,28 @@ async def pause_skip_watcher(message: Message, duration: int):
         await db["call"].set_is_mute(False)
         if "skipped" not in db:
             db["skipped"] = False
-        if "paused" not in db:
-            db["paused"] = False
-        if "stopped" not in db:
-            db["stopped"] = False
-        if "replayed" not in db:
-            db["replayed"] = False
+        if "fasilə verdi" not in db:
+            db["fasilə verdi"] = False
+        if "dayandı" not in db:
+            db["dayandı"] = False
+        if "təkrar oxundu" not in db:
+            db["təkrar oxundu"] = False
         restart_while = False
         while True:
             for _ in range(duration * 10):
-                if db["skipped"]:
-                    db["skipped"] = False
+                if db["atladı"]:
+                    db["atladı"] = False
                     return await message.delete()
-                if db["paused"]:
-                    while db["paused"]:
+                if db["fasilə verdi"]:
+                    while db["fasilə verdi"]:
                         await asyncio.sleep(0.1)
                         continue
-                if db["stopped"]:
+                if db["dayandı"]:
                     restart_while = True
                     break
-                if db["replayed"]:
+                if db["təkrar oxundu"]:
                     restart_while = True
-                    db["replayed"] = False
+                    db["təkrar oxundu"] = False
                     break
                 if "queue_breaker" in db:
                     if db["queue_breaker"] != 0:
@@ -82,7 +82,7 @@ async def pause_skip_watcher(message: Message, duration: int):
                 break
             restart_while = False
             await asyncio.sleep(0.1)
-        db["skipped"] = False
+        db["atladı"] = False
     except Exception as e:
         e = traceback.format_exc()
         print(str(e))
@@ -203,7 +203,7 @@ async def generate_cover(
         await change_vc_title(title)
     except Exception:
         await send(
-            text="[ERROR]: FAILED TO EDIT VC TITLE, MAKE ME ADMIN."
+            text="[ERROR]: VC BÖLÜMÜNƏ RƏDƏT ETMƏ BİLMƏDİ, MƏNİ ADMIN EDİN."
         )
         pass
     return final
@@ -295,7 +295,7 @@ async def play_song(requested_by, query, message, service):
 
     else:
         await m.edit(
-            "__**Generating thumbnail, Downloading And Transcoding.**__"
+            "__**Miniatür yaradılması, Endirilməsi və Kodların dəyişdirilməsi.**__"
         )
         cover, _ = await download_transcode_gencover(
             requested_by,
@@ -307,10 +307,10 @@ async def play_song(requested_by, query, message, service):
         )
     await m.delete()
     caption = f"""
-**Name:** {title[:45]}
-**Duration:** {convert_seconds(duration)}
-**Requested By:** {message.from_user.mention}
-**Platform:** {service}
+**ad:** {title[:45]}
+**müddəti:** {convert_seconds(duration)}
+**Tələb edən:** {message.from_user.mention}
+**Platforma:** {service}
 """
     await m.delete()
     m = await message.reply_photo(
@@ -336,11 +336,11 @@ async def telegram(message):
         return await message.reply_text(err)
     if int(reply.audio.file_size) >= 104857600:
         return await message.reply_text("[ERROR]: SONG_TOO_BIG")
-    m = await message.reply_text("__**Downloading.**__")
+    m = await message.reply_text("__**Endirilir.**__")
     song = await message.reply_to_message.download()
-    await m.edit("__**Transcoding.**__")
+    await m.edit("__**Transkodlaşdırma.**__")
     await run_async(transcode, song)
-    await m.edit(f"__**Playing {reply.link}**__", disable_web_page_preview=True)
+    await m.edit(f"__**oynayan {reply.link}**__", disable_web_page_preview=True)
     await pause_skip_watcher(m, reply.audio.duration)
     if os.path.exists(song):
         os.remove(song)
