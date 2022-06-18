@@ -65,8 +65,8 @@ async def queuer(_, message):
     try:
         usage = """
 **Usage:**
-__/play Song_Name__
-__/play youtube/saavn Song_Name__
+__/play Mahnı_Adı__
+__/play youtube/saavn Mahnı_Adı__
 __/play Reply_On_Audio__"""
 
         async with PLAY_LOCK:
@@ -200,7 +200,7 @@ async def clear_queue(_, message):
         return await message.reply_text("**Queue Already is Empty**")
     db["playlist"] = False
     db["queue"] = asyncio.Queue()
-    await message.reply_text("**Successfully Cleared the Queue**")
+    await message.reply_text("**Növbə Uğurla Silindi Növbə Uğurla Təmizləndi**")
 
 
 @app.on_message(
@@ -217,9 +217,9 @@ async def playlist(_, message: Message, redirected=False):
         usage = """
 **Usage: Same as /play
 Example:
-    __**/playlist song_name1
-    song_name2
-    youtube song_name3**__"""
+    __**/playlist Mahnı_Adı1
+    mahnı_adı2
+    youtube mahnı_adı3**__"""
 
         return await message.reply_text(usage)
     if "call" not in db:
@@ -241,15 +241,15 @@ Example:
         requested_by = message.from_user.first_name
         await db["queue"].put(
             {
-                "service": service or telegram,
-                "requested_by": requested_by,
+                "xidmət": service or telegram,
+                "sorğu_tarafından": requested_by,
                 "query": song_name,
-                "message": message,
+                "mesaj": message,
             }
         )
     if not redirected:
         db["running"] = True
-        await message.reply_text("**Playlist Started.**")
+        await message.reply_text("**Pleylist başladı.**")
         await start_queue(message)
 
 
